@@ -59,7 +59,6 @@ public class MainGame extends BasicGame {
     @Override
     public void update(GameContainer container, int delta) throws SlickException {
         input = container.getInput();
-
         if (input.isKeyPressed(Input.KEY_1)) {
             if (remaining[index] > 0) {
                 int mouseX = input.getMouseX();
@@ -71,16 +70,22 @@ public class MainGame extends BasicGame {
                 }
             }
         } else if (input.isKeyPressed(Input.KEY_2)) {
-            if (remaining[index] < capacities[index]) {
-                mouseX = input.getMouseX();
-                mouseY = input.getMouseY();
-                if (mapTile.getFigureAt(mouseX, mouseY) != FigureType.Null) {
-                    FigureType current = mapTile.getFigureAt(mouseX, mouseY);
-                    mapTile.clearTile(mouseX, mouseY);
+        	System.out.println("Trebao bih brisat");
+        	mouseX = input.getMouseX();
+            mouseY = input.getMouseY();
+        	FigureType current = mapTile.getFigureAt(mouseX, mouseY);
+        	int index = current.getIndex();
+        	System.out.println(index);
+        	
+        	if(current != FigureType.Null)
+        	{
+        		if(remaining[index] < capacities[index])
+        		{
+        			mapTile.clearTile(mouseX, mouseY);
                     remaining[current.ordinal()]++;
                     showRemaining();
-                }
-            }
+        		}
+        	}
         }
 
         if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
