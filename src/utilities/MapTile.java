@@ -7,12 +7,12 @@ import org.newdawn.slick.SlickException;
 
 public class MapTile {
     private int[][][] matrix;
-    private int xMax, yMax;
+    
+    private final int xMax = 10,  yMax = 10;
     private Image image;
 
-    public MapTile(final int WIDTH, final int HEIGHT) {
-        xMax = WIDTH / Consts.TILE_WIDTH;
-        yMax = HEIGHT / Consts.TILE_HEIGHT;
+    public MapTile() {
+    	
         matrix = new int[xMax][yMax][2];
         for (int i = 0; i < xMax; i++) {
             for (int j = 0; j < yMax; j++) {
