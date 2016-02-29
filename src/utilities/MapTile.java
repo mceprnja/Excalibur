@@ -75,6 +75,22 @@ public class MapTile {
     	}
     }
     
+    public int getTileColorBeforeMoving(int mouseX, int mouseY){
+    	int tileX = getTileX(mouseX);
+    	int tileY = getTileY(mouseY);
+    	
+//    	System.out.println(matrix[tileX][tileY][0]);
+    	return matrix[tileX][tileY][0];
+    }
+    
+    public int getTileColor(int wasColor){
+    	
+    	if(wasColor == TileType.DirtRed.ordinal()){
+    		return 0;
+    	}   	
+    	return 1;
+    }
+    
     public int getTileX(int x) {
         int xTile = (int) Math.floor(x / (Consts.TILE_WIDTH + 1)); // padding
         if (xTile >= xMax)
