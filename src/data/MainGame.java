@@ -29,6 +29,7 @@ public class MainGame extends BasicGame {
     private boolean amIAllowedToPlaceThere = false;
     int figureColor = 0; //0 red, 1 - blue
     int tileColorBeforeRemoving = 0;
+    int tileColorAfterRemoving = 0;
     int tileColorBeforeRemovingDelete = 0;
     private FigureType current;
     private boolean isCurrentSwordOrDragon;
@@ -81,7 +82,7 @@ public class MainGame extends BasicGame {
             if (remaining[figureColor][index] > 0) {
                 int mouseX = input.getMouseX();
                 int mouseY = input.getMouseY();
-                if (mapTile.canPlaceAt(mouseX, mouseY)) {
+                if (mapTile.canPlaceAt(mouseX, mouseY, false)) {
                     mapTile.setFigureAt(mouseX, mouseY, index, figureColor);
                     remaining[figureColor][index]--;
                     showRemaining();
@@ -135,17 +136,25 @@ public class MainGame extends BasicGame {
 
         }
         if (!input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && wasDown && isCurrentSwordOrDragon == false) {
-//        	System.out.println("Jesam li na istom mistu?");
+        	System.out.println("Jesam li na istom mistu?");
         	boolean amIOnSamePlace = (mapTile.getTileX(mouseX) == mapTile.getTileX(oldTileX) && mapTile.getTileY(mouseY) == mapTile.getTileY(oldTileY)) ? true : false;
 //        	System.out.println(amIOnSamePlace);
             if (current == FigureType.Null) {
                 System.out.println("it was null");
             } else {
-            	int currentTileColor = mapTile.getTileColor(tileColorBeforeRemoving);
-                if (mapTile.canPlaceAt(mouseX, mouseY) && amIAllowedToPlaceThere && isRightPlayerPlaying) {
-                    mapTile.setFigureAt(mouseX, mouseY, current.ordinal(), currentTileColor);
+            	System.out.println("Am i allowed to place there: " + amIAllowedToPlaceThere);
+            	System.out.println("isRightPlayerPlaying " + isRightPlayerPlaying);
+            	int exTileColor = mapTile.getTileColor(tileColorBeforeRemoving); //returning 0 or 1
+//            	System.out.println("Can place at " + mapTile.canPlaceAt(mouseX, mouseY));
+            	
+            	tileColorAfterRemoving = mapTile.getTileColorBeforeMoving(mouseX, mouseY);
+            	int currentTileColor = mapTile.getTileColor(tileColorAfterRemoving);
+            	
+                if (mapTile.canPlaceAt(mouseX, mouseY, currentTileColor, exTileColor) && amIAllowedToPlaceThere) {
+                	System.out.println("Placing here");
+                    mapTile.setFigureAt(mouseX, mouseY, current.ordinal(), exTileColor);
                 } else {
-                    mapTile.setFigureAt(oldTileX, oldTileY, current.ordinal(), currentTileColor);
+                    mapTile.setFigureAt(oldTileX, oldTileY, current.ordinal(), exTileColor);
                 }
             }
             wasDown = false;

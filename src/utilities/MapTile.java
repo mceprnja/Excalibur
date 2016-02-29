@@ -64,6 +64,7 @@ public class MapTile {
 //    	System.out.println(tileY);
 //    	System.out.println(isSetting);
 //    	System.out.println(isRed);
+//    	System.out.println(isRed);
     	if(isSetting) {
     		if(isRed) {
     			matrix[tileX][tileY][0] = TileType.DirtRed.ordinal();
@@ -115,7 +116,7 @@ public class MapTile {
         if (xTile >= xMax || yTile >= yMax) {
             return;
         }
-
+        
         matrix[xTile][yTile][1] = figure;
     }
     
@@ -124,10 +125,15 @@ public class MapTile {
         int xTile =  (int) Math.floor(x / (Consts.TILE_WIDTH + 1)); // padding
         int yTile =  (int) Math.floor(y / (Consts.TILE_HEIGHT + 1)); // padding
         if (xTile >= xMax || yTile >= yMax) {
+        	System.out.println("OUT");
             return;
         }
         
+        System.out.println("xTile: " + xTile + " yTile " + yTile);
+        
         this.changeTileBackground(xTile, yTile, true, isRed);
+//        System.out.println(matrix[xTile][yTile][1]);
+//        System.out.println(figure);
         matrix[xTile][yTile][1] = figure;
     }
 
@@ -145,11 +151,15 @@ public class MapTile {
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[i].length; j++) {
                 matrix[i][j][1] = -1;
+
+                if(matrix[i][j][0] != TileType.Water.ordinal()){
+                	matrix[i][j][0] = TileType.Dirt.ordinal();
+                }
             }
         }
     }
     
-    public boolean canPlaceAt(int x, int y) {
+    public boolean canPlaceAt(int x, int y, int currentTileColor, int exTileColor) {
         int xTile =  (int) Math.floor(x / (Consts.TILE_WIDTH + 1)); // padding
         int yTile =  (int) Math.floor(y / (Consts.TILE_HEIGHT + 1)); // padding
         
@@ -157,11 +167,22 @@ public class MapTile {
             return false ;
         }
         
-        return (matrix[xTile][yTile][0] == 0 && matrix[xTile][yTile][1] == -1);
+        return (!(matrix[xTile][yTile][0] == TileType.Water.ordinal()) && (matrix[xTile][yTile][1] == -1 || currentTileColor != exTileColor)); //&&  == 
+    }
+    
+    public boolean canPlaceAt(int x, int y, boolean isSetting) { //if it is setting part they cant go on each other
+        int xTile =  (int) Math.floor(x / (Consts.TILE_WIDTH + 1)); // padding
+        int yTile =  (int) Math.floor(y / (Consts.TILE_HEIGHT + 1)); // padding
+        
+        if (xTile >= xMax || yTile >= yMax) {
+            return false ;
+        }
+        
+        return (!(matrix[xTile][yTile][0] == TileType.Water.ordinal()) && matrix[xTile][yTile][1] == -1); //&& matrix[xTile][yTile][1] == -1
     }
     
     public boolean canPlaceAtWithTileIndex(int tileX, int tileY) {
-    	return (matrix[tileX][tileY][0] == 0 && matrix[tileX][tileY][1] == -1);
+    	return (!(matrix[tileX][tileY][0] == TileType.Water.ordinal())); // && matrix[tileX][tileY][1] == -1
     }
 
     public FigureType getFigureAt(int x, int y) {
