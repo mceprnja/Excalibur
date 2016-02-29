@@ -22,8 +22,8 @@ public class MainGame extends BasicGame {
     private MapTile mapTile = new MapTile();
 
     private Input input;
-    private int[] capacities = { 6, 1, 1, 1, 8, 2, 4, 4, 1, 3, 4, 5 };
-    private int[] remaining = { 6, 1, 1, 1, 8, 2, 4, 4, 1, 3, 4, 5 };
+    private int[][] capacities = {{ 6, 1, 1, 1, 8, 2, 4, 4, 1, 3, 4, 5 }, { 6, 1, 1, 1, 8, 2, 4, 4, 1, 3, 4, 5 }};
+    private int[][] remaining = {{ 6, 1, 1, 1, 8, 2, 4, 4, 1, 3, 4, 5 }, { 6, 1, 1, 1, 8, 2, 4, 4, 1, 3, 4, 5 }};
     private int index = 0;
     private boolean amIAllowedToPlaceThere = false;
     int figureColor = 0; //0 red, 1 - blue
@@ -75,12 +75,12 @@ public class MainGame extends BasicGame {
         }
         
         if (input.isKeyPressed(Input.KEY_1)) {
-            if (remaining[index] > 0) {
+            if (remaining[figureColor][index] > 0) {
                 int mouseX = input.getMouseX();
                 int mouseY = input.getMouseY();
                 if (mapTile.canPlaceAt(mouseX, mouseY)) {
                     mapTile.setFigureAt(mouseX, mouseY, index, figureColor);
-                    remaining[index]--;
+                    remaining[figureColor][index]--;
                     showRemaining();
                 }
             }
@@ -94,10 +94,10 @@ public class MainGame extends BasicGame {
         	
         	if(current != FigureType.Null)
         	{
-        		if(remaining[index] < capacities[index])
+        		if(remaining[figureColor][index] < capacities[figureColor][index])
         		{
         			mapTile.clearTile(mouseX, mouseY);
-                    remaining[current.ordinal()]++;
+                    remaining[figureColor][current.ordinal()]++;
                     showRemaining();
         		}
         	}
@@ -142,7 +142,7 @@ public class MainGame extends BasicGame {
 
         if (input.isKeyPressed(Keyboard.KEY_TAB)) {
             index++;
-            index %= remaining.length;
+            index %= remaining[figureColor].length;
 
             System.out.println("Now placing " + FigureType.values()[index].getName());
         }
@@ -151,9 +151,12 @@ public class MainGame extends BasicGame {
             showRemaining();
         }
         if (input.isKeyPressed(Keyboard.KEY_R)) {
+//        	System.out.println(remaining.length);
             mapTile.clearAll();
             for (int i = 0; i < remaining.length; i++) {
-                remaining[i] = capacities[i];
+            	for(int j = 0; j < remaining[figureColor].length; j++) {
+                    remaining[i][j] = capacities[i][j];
+            	}
             }
             showRemaining();
         }
@@ -195,10 +198,20 @@ public class MainGame extends BasicGame {
     }
 
     public void showRemaining() {
-        for (int i = 0; i < remaining.length; i++) {
-            System.out.print(remaining[i] + " " + FigureType.values()[i].getName() + ", ");
+    	this.showColor();    	
+    	
+        for (int i = 0; i < remaining[figureColor].length; i++) {
+            System.out.print(remaining[figureColor][i] + " " + FigureType.values()[i].getName() + ", ");
         }
         System.out.println();
+    }
+    
+    private void showColor() {
+    	if(figureColor == 0){
+    		System.out.println("RED FIGURES");
+    	} else {
+    		System.out.println("BLUE FIGURES");
+    	}
     }
     
     public boolean isScoutMovementValid(int tileIndexX, int tileIndexY, int oldTileIndexX, int oldTileIndexY) { //this part fornow dont solve is taken place or is water
