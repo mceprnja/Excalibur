@@ -110,7 +110,9 @@ public class MainGame extends BasicGame {
 
         }
         if (!input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && wasDown && isCurrentSwordOrDragon == false) {
-//        	System.out.println("TEST3");
+        	System.out.println("Jesam li na istom mistu?");
+        	boolean amIOnSamePlace = (mapTile.getTileX(mouseX) == mapTile.getTileX(oldTileX) && mapTile.getTileY(mouseY) == mapTile.getTileY(oldTileY)) ? true : false;
+        	System.out.println(amIOnSamePlace);
             if (current == FigureType.Null) {
                 System.out.println("it was null");
             } else {

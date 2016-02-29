@@ -2,7 +2,11 @@ package utilities;
 
 public enum TileType {
 
-    Dirt("dirt", true), Water("water", false), Null("null", false);
+    Dirt("dirt", true),
+    Water("water", false),
+    Null("null", false),
+    DirtRed("dirt_red", true),
+    DirtBlue("dire_blue", true);
 
     private String tileName;
     private boolean walkable;
