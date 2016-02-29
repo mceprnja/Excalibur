@@ -6,7 +6,7 @@ public enum TileType {
     Water("water", false),
     Null("null", false),
     DirtRed("dirt_red", true),
-    DirtBlue("dire_blue", true);
+    DirtBlue("dirt_blue", true);
 
     private String tileName;
     private boolean walkable;

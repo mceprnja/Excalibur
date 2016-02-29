@@ -26,6 +26,7 @@ public class MainGame extends BasicGame {
     private int[] remaining = { 6, 1, 1, 1, 8, 2, 4, 4, 1, 3, 4, 5 };
     private int index = 0;
     private boolean amIAllowedToPlaceThere = false;
+    int figureColor = 0; //0 red, 1 - blue
     private FigureType current;
     private boolean isCurrentSwordOrDragon;
     private Image image;
@@ -60,12 +61,25 @@ public class MainGame extends BasicGame {
     @Override
     public void update(GameContainer container, int delta) throws SlickException {
         input = container.getInput();
+        
+        if(input.isKeyPressed(Input.KEY_F1)){
+//        	int mouseX = input.getMouseX();
+//            int mouseY = input.getMouseY();
+//        	mapTile.changeTileBackground(mapTile.getTileX(mouseX), mapTile.getTileX(mouseY), true, true);
+        	figureColor = ++figureColor % 2;
+        	if(figureColor == 0){
+        		System.out.println("Placing red now");
+        	} else {
+        		System.out.println("Placing blue now");
+        	}
+        }
+        
         if (input.isKeyPressed(Input.KEY_1)) {
             if (remaining[index] > 0) {
                 int mouseX = input.getMouseX();
                 int mouseY = input.getMouseY();
                 if (mapTile.canPlaceAt(mouseX, mouseY)) {
-                    mapTile.setFigureAt(mouseX, mouseY, index);
+                    mapTile.setFigureAt(mouseX, mouseY, index, figureColor);
                     remaining[index]--;
                     showRemaining();
                 }
@@ -110,16 +124,16 @@ public class MainGame extends BasicGame {
 
         }
         if (!input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && wasDown && isCurrentSwordOrDragon == false) {
-        	System.out.println("Jesam li na istom mistu?");
+//        	System.out.println("Jesam li na istom mistu?");
         	boolean amIOnSamePlace = (mapTile.getTileX(mouseX) == mapTile.getTileX(oldTileX) && mapTile.getTileY(mouseY) == mapTile.getTileY(oldTileY)) ? true : false;
-        	System.out.println(amIOnSamePlace);
+//        	System.out.println(amIOnSamePlace);
             if (current == FigureType.Null) {
                 System.out.println("it was null");
             } else {
                 if (mapTile.canPlaceAt(mouseX, mouseY) && amIAllowedToPlaceThere) {
-                    mapTile.setFigureAt(mouseX, mouseY, current.ordinal());
+                    mapTile.setFigureAt(mouseX, mouseY, current.ordinal(), figureColor);
                 } else {
-                    mapTile.setFigureAt(oldTileX, oldTileY, current.ordinal());
+                    mapTile.setFigureAt(oldTileX, oldTileY, current.ordinal(), figureColor);
                 }
             }
             wasDown = false;

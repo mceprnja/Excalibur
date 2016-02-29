@@ -13,7 +13,7 @@ public class MapTile {
 
     public MapTile() {
     	
-        matrix = new int[xMax][yMax][2];
+        matrix = new int[xMax][yMax][3];
         for (int i = 0; i < xMax; i++) {
             for (int j = 0; j < yMax; j++) {
                 if (j == 4 && i == 2)
@@ -25,6 +25,7 @@ public class MapTile {
                 else
                     matrix[i][j][0] = TileType.Dirt.ordinal();
                 matrix[i][j][1] = -1;
+                matrix[i][j][2] = -1; //-1 empty, 0 red, 1 blue
             }
         }
     }
@@ -56,7 +57,24 @@ public class MapTile {
         }
 
     }
-
+    
+    private void changeTileBackground(int tileX, int tileY, boolean isSetting, boolean isRed) {
+//    	System.out.println("LOLOLO");
+//    	System.out.println(tileX);
+//    	System.out.println(tileY);
+//    	System.out.println(isSetting);
+//    	System.out.println(isRed);
+    	if(isSetting) {
+    		if(isRed) {
+    			matrix[tileX][tileY][0] = TileType.DirtRed.ordinal();
+    		} else {
+    			matrix[tileX][tileY][0] = TileType.DirtBlue.ordinal();
+    		}
+    	} else {
+    		matrix[tileX][tileY][0] = TileType.Dirt.ordinal();
+    	}
+    }
+    
     public int getTileX(int x) {
         int xTile = (int) Math.floor(x / (Consts.TILE_WIDTH + 1)); // padding
         if (xTile >= xMax)
@@ -84,6 +102,18 @@ public class MapTile {
 
         matrix[xTile][yTile][1] = figure;
     }
+    
+    public void setFigureAt(int x, int y, int figure, int figureColor) {
+    	boolean isRed = figureColor == 0 ? true : false;
+        int xTile =  (int) Math.floor(x / (Consts.TILE_WIDTH + 1)); // padding
+        int yTile =  (int) Math.floor(y / (Consts.TILE_HEIGHT + 1)); // padding
+        if (xTile >= xMax || yTile >= yMax) {
+            return;
+        }
+        
+        this.changeTileBackground(xTile, yTile, true, isRed);
+        matrix[xTile][yTile][1] = figure;
+    }
 
     public void clearTile(int x, int y) {
         int xTile =  (int) Math.floor(x / (Consts.TILE_WIDTH + 1)); // padding
@@ -91,6 +121,7 @@ public class MapTile {
         if (xTile >= xMax || yTile >= yMax) {
             return;
         }
+        this.changeTileBackground(xTile, yTile, false, false);
         matrix[xTile][yTile][1] = -1;
     }
 
