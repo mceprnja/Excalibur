@@ -25,6 +25,7 @@ public class MainGame extends BasicGame {
     private int[] capacities = { 6, 1, 1, 1, 8, 2, 4, 4, 1, 3, 4, 5 };
     private int[] remaining = { 6, 1, 1, 1, 8, 2, 4, 4, 1, 3, 4, 5 };
     private int index = 0;
+    private boolean amIAllowedToPlaceThere = false;
     private FigureType current;
     private boolean isCurrentSwordOrDragon;
     private Image image;
@@ -75,7 +76,7 @@ public class MainGame extends BasicGame {
             mouseY = input.getMouseY();
         	FigureType current = mapTile.getFigureAt(mouseX, mouseY);
         	int index = current.getIndex();
-        	System.out.println(index);
+//        	System.out.println(index);
         	
         	if(current != FigureType.Null)
         	{
@@ -94,11 +95,12 @@ public class MainGame extends BasicGame {
             mouseY = input.getMouseY();            
         }
         if (input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
-        	System.out.println("TEST2");
+//        	System.out.println("TEST2");
             current = mapTile.getFigureAt(mouseX, mouseY);
             isCurrentSwordOrDragon = current == FigureType.Dragon || current == FigureType.Sword;
             oldTileX = mouseX;
             oldTileY = mouseY;
+            
             if(isCurrentSwordOrDragon == false)
             {
                 mapTile.clearTile(oldTileX, oldTileY);
@@ -108,11 +110,11 @@ public class MainGame extends BasicGame {
 
         }
         if (!input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && wasDown && isCurrentSwordOrDragon == false) {
-        	System.out.println("TEST3");
+//        	System.out.println("TEST3");
             if (current == FigureType.Null) {
                 System.out.println("it was null");
             } else {
-                if (mapTile.canPlaceAt(mouseX, mouseY)) {
+                if (mapTile.canPlaceAt(mouseX, mouseY) && amIAllowedToPlaceThere) {
                     mapTile.setFigureAt(mouseX, mouseY, current.ordinal());
                 } else {
                     mapTile.setFigureAt(oldTileX, oldTileY, current.ordinal());
@@ -150,6 +152,30 @@ public class MainGame extends BasicGame {
             g.drawImage(image, mouseX, mouseY, mouseX + Consts.TILE_WIDTH, mouseY + Consts.TILE_HEIGHT, 0, 0,
                     image.getWidth(), image.getHeight());
         }
+//       NE IDE OVO OVDI
+        if(current != null && isCurrentSwordOrDragon == false) {//red - if he cant place figure there, in this part i want to solve amIAllowedToPlaceThere
+//        	System.out.println("Show where i can go");
+        	int tileIndexX = mapTile.getTileX(mouseX);
+        	int tileIndexY =mapTile.getTileY(mouseY);
+        	int oldTileIndexX = mapTile.getTileX(oldTileX);
+        	int oldTileIndexY = mapTile.getTileY(oldTileY);
+        	boolean amIScout = current == FigureType.Scout;
+        	
+        	if(amIScout == true){
+        		if(isScoutMovementValid(tileIndexX, tileIndexY, oldTileIndexX, oldTileIndexY) && !doesScoutCrossOtherFigureOrWater(tileIndexX, tileIndexY, oldTileIndexX, oldTileIndexY)) {
+        			amIAllowedToPlaceThere = true;
+        		} else {
+        			amIAllowedToPlaceThere = false;
+        		}
+        	} else {
+        		if(isOtherFiguresMovementValid(tileIndexX, tileIndexY, oldTileIndexX, oldTileIndexY)){
+        			amIAllowedToPlaceThere = true;
+        		} else {
+        			amIAllowedToPlaceThere = false;
+        		}
+        	}
+        	
+        }
     }
 
     public void showRemaining() {
@@ -157,5 +183,55 @@ public class MainGame extends BasicGame {
             System.out.print(remaining[i] + " " + FigureType.values()[i].getName() + ", ");
         }
         System.out.println();
+    }
+    
+    public boolean isScoutMovementValid(int tileIndexX, int tileIndexY, int oldTileIndexX, int oldTileIndexY) { //this part fornow dont solve is taken place or is water
+    	
+    	return (tileIndexX == oldTileIndexX || tileIndexY == oldTileIndexY) ?
+    			true : false;
+
+    }
+    
+    public boolean isOtherFiguresMovementValid(int tileIndexX, int tileIndexY, int oldTileIndexX, int oldTileIndexY) {
+    	
+    	return ((tileIndexX == oldTileIndexX + 1 || tileIndexX == oldTileIndexX - 1) && tileIndexY == oldTileIndexY) 
+ 			|| ((tileIndexY == oldTileIndexY + 1 || tileIndexY == oldTileIndexY - 1) && tileIndexX == oldTileIndexX) ?
+ 					true : false;
+    }
+    
+    public boolean doesScoutCrossOtherFigureOrWater(int tileIndexX, int tileIndexY, int oldTileIndexX, int oldTileIndexY) { //radi udesno - ulivo moze preskakivat
+    	if(tileIndexX == oldTileIndexX){
+    		for(int i = oldTileIndexY + 1; i < tileIndexY; i++) {
+    			if(!mapTile.canPlaceAtWithTileIndex(tileIndexX, i)){
+//    				System.out.println("Preklapa se s necim");
+    				return true;
+    			}
+    		}
+    		
+    		for(int i = oldTileIndexY - 1; i > tileIndexY; i--){
+    			if(!mapTile.canPlaceAtWithTileIndex(tileIndexX, i)){
+//    				System.out.println("PREKLAPA SE S NECIM");
+    				return true;
+    			}
+    		}
+    		
+    	} else {
+    		for(int i = oldTileIndexX + 1; i < tileIndexX; i++) {
+    			if(!mapTile.canPlaceAtWithTileIndex(i, tileIndexY)){
+//    				System.out.println("Preklapa se s necim");
+    				return true;
+    			}
+    		}
+    		
+    		for(int i = oldTileIndexX - 1; i > tileIndexX; i--){
+    			if(!mapTile.canPlaceAtWithTileIndex(i, tileIndexY)){
+//    				System.out.println("PREKLAPA SE S NECIM");
+    				return true;
+    			}
+    		}
+    	}
+    	
+    	
+    	return false;
     }
 }

@@ -112,6 +112,10 @@ public class MapTile {
         
         return (matrix[xTile][yTile][0] == 0 && matrix[xTile][yTile][1] == -1);
     }
+    
+    public boolean canPlaceAtWithTileIndex(int tileX, int tileY) {
+    	return (matrix[tileX][tileY][0] == 0 && matrix[tileX][tileY][1] == -1);
+    }
 
     public FigureType getFigureAt(int x, int y) {
         FigureType type = null;
