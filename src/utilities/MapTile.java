@@ -77,7 +77,6 @@ public class MapTile {
     	int tileX = getTileX(mouseX);
     	int tileY = getTileY(mouseY);
     	
-//    	System.out.println(matrix[tileX][tileY][0]);
     	return matrix[tileX][tileY][0];
     }
     
@@ -85,16 +84,8 @@ public class MapTile {
     	int xTile = getTileX(mouseX);
     	int yTile = getTileY(mouseY);
     	int tileColor = matrix[xTile][yTile][2];
-    	System.out.println("Tile color: " + tileColor);
     	
     	return tileColor;
-//    	if(tileColor == 3){
-//    		return 0;
-//    	} else if (tileColor == 4) {
-//    		return 1;
-//    	} else {
-//    		return -1;
-//    	}
     }
     
     public int getTileX(int x) {
@@ -115,16 +106,6 @@ public class MapTile {
         return TileType.values()[matrix[getTileX(x)][getTileY(y)][0]];
     }
 
-    public void setFigureAt(int x, int y, int figure) {
-        int xTile =  (int) Math.floor(x / (Consts.TILE_WIDTH + 1)); // padding
-        int yTile =  (int) Math.floor(y / (Consts.TILE_HEIGHT + 1)); // padding
-        if (xTile >= xMax || yTile >= yMax) {
-            return;
-        }
-        
-        matrix[xTile][yTile][1] = figure;
-    }
-    
     public void setFigureAt(int x, int y, int figure, int figureColor) {
     	boolean isRed = figureColor == 0 ? true : false;
         int xTile =  (int) Math.floor(x / (Consts.TILE_WIDTH + 1)); // padding
@@ -133,55 +114,51 @@ public class MapTile {
         	System.out.println("OUT");
             return;
         }
-        
-        System.out.println("xTile: " + xTile + " yTile " + yTile);
-        
+               
         this.changeTileBackground(xTile, yTile, true, isRed);
         matrix[xTile][yTile][1] = figure;
     }
     
-    public void setFigureAt(int x, int y, int oldX, int oldY, int oldTileColor, FigureType currentFigure) {
+    public int setFigureAt(int x, int y, int oldX, int oldY, int oldTileColor, FigureType currentFigure) {
     	boolean isRed = oldTileColor == 0 ? true : false;
         int xTile =  (int) Math.floor(x / (Consts.TILE_WIDTH + 1)); // padding
         int yTile =  (int) Math.floor(y / (Consts.TILE_HEIGHT + 1)); // padding
         int xOldTile = getTileX(oldX);
         int yOldTile = getTileY(oldY);
         int futureTileColor = getTileColor(oldX, oldY);
-//        System.out.println(futureTileColor);
-//        System.out.println(oldTileColor);
-//        
-        if (xTile >= xMax || yTile >= yMax || futureTileColor == oldTileColor) { // 
+        FigureType figureAtFutureTile = getFigureAt(x, y);
+        //        
+        if (xTile >= xMax || yTile >= yMax || futureTileColor == oldTileColor || currentFigure == null) { // 
         	System.out.println("OUT");
-            return;
+            return -100;
         }
-        
-        
-        
-//        System.out.println("Figure je: "  + figure);
-//        System.out.println("Staro polje je crveno" + exTileColor);
-//        THIS PART SHOULD RESOLVE KILLING
-//        if(newTileColor != exTileColor && figure != -1 && matrix[xTile][yTile][1] != -1){
-////        	System.out.println("IDE POKOLJ");
-//        	int figure1 = figure;
-//        	int figure2 = matrix[xTile][yTile][1];
-////        	System.out.println("Figure1 je: "  + figure1);
-////        	System.out.println("Figure2 je: "  + figure2);
-////        	
-//        	if(figure1 > figure2) {
-//        		isRed = true;
-//        		figure = figure1;
-//        		System.out.println("TU SAM");
-//        	} else {
-//        		isRed = false;
-//        		xTile = xOldTile;
-//        		yTile = yOldTile;
-//        		figure = figure2;
-//        		System.out.println("Evo me SAM");
-//        	}
-//        }
-//        System.out.println("Figure je: "  + figure);
-        this.changeTileBackground(xTile, yTile, true, isRed);
-        matrix[xTile][yTile][1] = currentFigure.getIndex();
+
+        if(matrix[xTile][yTile][1] != -1){	
+//        	System.out.println("Pokolj");
+        	int fightResolver = resolveFight(currentFigure, figureAtFutureTile);
+        	System.out.println("Fight resolver : " + fightResolver);
+        	
+        	if(fightResolver == 100) {
+        		System.out.println("IMAMO POBJEDNIKA");
+        		return 100;
+        	} else if (fightResolver == 0) {
+        		matrix[xTile][yTile][1] = -1;
+        		this.changeTileBackground(xTile, yTile, false, false);
+        		return 0;
+        	} else if (fightResolver == 1) {
+        		matrix[xTile][yTile][1] = currentFigure.getIndex();
+        		this.changeTileBackground(xTile, yTile, true, isRed);
+        		return 1;
+        	} else {
+        		matrix[xTile][yTile][1] = figureAtFutureTile.getIndex();
+        		this.changeTileBackground(xTile, yTile, true, !isRed);
+        		return 2;
+        	}
+        } else {
+        	this.changeTileBackground(xTile, yTile, true, isRed);
+            matrix[xTile][yTile][1] = currentFigure.getIndex();
+            return 5;
+        }        
     }
     
     public void clearTile(int x, int y) {
@@ -206,29 +183,26 @@ public class MapTile {
         }
     }
     
-    public boolean canPlaceAt(int x, int y, int currentTileColor, int exTileColor) {
-        int xTile =  (int) Math.floor(x / (Consts.TILE_WIDTH + 1)); // padding
-        int yTile =  (int) Math.floor(y / (Consts.TILE_HEIGHT + 1)); // padding
+    public boolean canPlaceAt(int x, int y, int currentTileColor, int futureTileColor) {
+    	int xTile =  getTileX(x);; // padding
+        int yTile =  getTileY(y); // padding
         
         if (xTile >= xMax || yTile >= yMax) {
             return false ;
         }
         
-        System.out.println("Current tile color" + currentTileColor);
-        System.out.println("Ex tile color" + exTileColor);
-        
-        return (!(matrix[xTile][yTile][0] == TileType.Water.ordinal()) && (matrix[xTile][yTile][1] == -1 || currentTileColor != exTileColor)); //&&  == 
+        return (!(matrix[xTile][yTile][0] == TileType.Water.ordinal()) && (matrix[xTile][yTile][1] == -1 || currentTileColor != futureTileColor)); //&&  == 
     }
     
     public boolean canPlaceAt(int x, int y, boolean isSetting) { //if it is setting part they cant go on each other
-        int xTile =  (int) Math.floor(x / (Consts.TILE_WIDTH + 1)); // padding
-        int yTile =  (int) Math.floor(y / (Consts.TILE_HEIGHT + 1)); // padding
+        int xTile =  getTileX(x);; // padding
+        int yTile =  getTileY(y); // padding
         
         if (xTile >= xMax || yTile >= yMax) {
             return false ;
         }
         
-        return (!(matrix[xTile][yTile][0] == TileType.Water.ordinal()) && matrix[xTile][yTile][1] == -1); //&& matrix[xTile][yTile][1] == -1
+        return (!(matrix[xTile][yTile][0] == TileType.Water.ordinal()) && matrix[xTile][yTile][1] == -1);
     }
     
     public boolean canPlaceAtWithTileIndex(int tileX, int tileY) {
@@ -253,5 +227,110 @@ public class MapTile {
     public void update() {
 
     }
-
+    
+    private int resolveFight(FigureType currentFigure, FigureType figureAtFutureTile){ //return 0 if same, return 1 is current one is winning,
+    																//return 2 if figure at next tile is winning, return 100 if attacker is FULL GAME WINNER 
+    	if(currentFigure == figureAtFutureTile) {
+    		return 0;
+    	} else {
+    		if(currentFigure == FigureType.Jester){
+    			if(figureAtFutureTile == FigureType.Dragon){
+    				return 2;
+    			} else if (figureAtFutureTile == FigureType.Sword){
+    				return 100;
+    			} else {
+    				return 1;
+    			}
+    		} else if(currentFigure == FigureType.King){
+    			if(figureAtFutureTile == FigureType.Dragon){
+    				return 2;
+    			} else if (figureAtFutureTile == FigureType.Sword){
+    				return 100;
+    			} else {
+    				return 1;
+    			}
+    		} else if (currentFigure == FigureType.Knight) {
+    			if(figureAtFutureTile == FigureType.Dragon || figureAtFutureTile == FigureType.King){
+    				return 2;
+    			} else if (figureAtFutureTile == FigureType.Sword){
+    				return 100;
+    			} else {
+    				return 1;
+    			}
+    		} else if(currentFigure == FigureType.SpearHorseman){
+    			if(figureAtFutureTile == FigureType.Dragon || figureAtFutureTile == FigureType.King || figureAtFutureTile == FigureType.Knight){
+    				return 2;
+    			} else if (figureAtFutureTile == FigureType.Sword){
+    				return 100;
+    			} else {
+    				return 1;
+    			}
+    		} else if(currentFigure == FigureType.SwordHorseman) {
+    			if(figureAtFutureTile == FigureType.Dragon || figureAtFutureTile == FigureType.King || figureAtFutureTile == FigureType.Knight 
+    					|| figureAtFutureTile == FigureType.SpearHorseman){
+    				return 2;
+    			} else if (figureAtFutureTile == FigureType.Sword){
+    				return 100;
+    			} else {
+    				return 1;
+    			}
+    		} else if(currentFigure == FigureType.Spearman) {
+    			if(figureAtFutureTile == FigureType.Dragon || figureAtFutureTile == FigureType.King || figureAtFutureTile == FigureType.Knight 
+    					|| figureAtFutureTile == FigureType.SpearHorseman || figureAtFutureTile == FigureType.SwordHorseman){
+    				return 2;
+    			} else if (figureAtFutureTile == FigureType.Sword){
+    				return 100;
+    			} else {
+    				return 1;
+    			}
+    		} else if(currentFigure == FigureType.Swordsman) {
+    			if(figureAtFutureTile == FigureType.Dragon || figureAtFutureTile == FigureType.King || figureAtFutureTile == FigureType.Knight 
+    					|| figureAtFutureTile == FigureType.SpearHorseman || figureAtFutureTile == FigureType.SwordHorseman || figureAtFutureTile == FigureType.Spearman){
+    				return 2;
+    			} else if (figureAtFutureTile == FigureType.Sword){
+    				return 100;
+    			} else {
+    				return 1;
+    			}
+    		} else if(currentFigure == FigureType.Squire) {
+    			if(figureAtFutureTile == FigureType.Dragon || figureAtFutureTile == FigureType.King || figureAtFutureTile == FigureType.Knight 
+    					|| figureAtFutureTile == FigureType.SpearHorseman || figureAtFutureTile == FigureType.SwordHorseman || figureAtFutureTile == FigureType.Spearman
+    					|| figureAtFutureTile == FigureType.Swordsman){
+    				return 2;
+    			} else if (figureAtFutureTile == FigureType.Sword){
+    				return 100;
+    			} else {
+    				return 1;
+    			}
+    		} else if(currentFigure == FigureType.Wizard) {
+    			if(figureAtFutureTile == FigureType.King || figureAtFutureTile == FigureType.Knight || figureAtFutureTile == FigureType.SpearHorseman 
+    					|| figureAtFutureTile == FigureType.SwordHorseman || figureAtFutureTile == FigureType.Spearman || figureAtFutureTile == FigureType.Swordsman
+    					|| figureAtFutureTile == FigureType.Squire){
+    				return 2;
+    			} else if (figureAtFutureTile == FigureType.Sword){
+    				return 100;
+    			} else {
+    				return 1;
+    			}
+    		} else if(currentFigure == FigureType.Scout) {
+    			if(figureAtFutureTile == FigureType.Dragon || figureAtFutureTile == FigureType.King || figureAtFutureTile == FigureType.Knight 
+    					|| figureAtFutureTile == FigureType.SpearHorseman || figureAtFutureTile == FigureType.SwordHorseman || figureAtFutureTile == FigureType.Spearman
+    					|| figureAtFutureTile == FigureType.Swordsman || figureAtFutureTile == FigureType.Wizard){
+    				return 2;
+    			} else if (figureAtFutureTile == FigureType.Sword){
+    				return 100;
+    			} else {
+    				return 1;
+    			}
+    		} else {
+    			System.out.println("Igrate s zmajem ili macem sto nije dobro");
+    		}
+    		
+    		
+    		
+    		
+    	}
+    	
+    	return 0;
+    }
 }
