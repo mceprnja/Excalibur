@@ -31,8 +31,9 @@ public class MainGame extends BasicGame {
     int tileColorBeforeRemoving = 0;
     int tileColorAfterRemoving = 0;
     int tileColorBeforeRemovingDelete = 0;
-    private FigureType current;
-    private boolean isCurrentSwordOrDragon;
+    private FigureType currentFigure;
+    private int currentFigureTileColor;
+    private boolean iscurrentFigureFigureSwordOrDragon;
     private Image image;
     private int oldTileX, oldTileY;
     int mouseX, mouseY;
@@ -67,9 +68,6 @@ public class MainGame extends BasicGame {
         input = container.getInput();
         
         if(input.isKeyPressed(Input.KEY_F1)){
-//        	int mouseX = input.getMouseX();
-//            int mouseY = input.getMouseY();
-//        	mapTile.changeTileBackground(mapTile.getTileX(mouseX), mapTile.getTileX(mouseY), true, true);
         	figureColor = ++figureColor % 2;
         	if(figureColor == 0){
         		System.out.println("Placing red now");
@@ -78,7 +76,7 @@ public class MainGame extends BasicGame {
         	}
         }
         
-        if (input.isKeyPressed(Input.KEY_1)) {
+        if (input.isKeyPressed(Input.KEY_1)) { //initial setting
             if (remaining[figureColor][index] > 0) {
                 int mouseX = input.getMouseX();
                 int mouseY = input.getMouseY();
@@ -89,76 +87,73 @@ public class MainGame extends BasicGame {
                 }
             }
         } else if (input.isKeyPressed(Input.KEY_2)) {
-//        	System.out.println("Trebao bih brisat");
         	mouseX = input.getMouseX();
             mouseY = input.getMouseY();
-        	FigureType current = mapTile.getFigureAt(mouseX, mouseY);
+        	FigureType currentFigure = mapTile.getFigureAt(mouseX, mouseY);
+        	int figureIndex = currentFigure.getIndex();
         	
         	tileColorBeforeRemovingDelete = mapTile.getTileColorBeforeMoving(mouseX, mouseY); // 3 -red, 4 -blue
-            boolean isRed = tileColorBeforeRemovingDelete == 3;
-            int colorIndex = isRed ? 0 : 1;
+            boolean isRedFigure = tileColorBeforeRemovingDelete == 3;
+            int colorIndex = isRedFigure ? 0 : 1;
+            
         	
-        	int index = current.getIndex();
-        	
-        	if(current != FigureType.Null && this.isRedTurn() == isRed) {
-        		if(remaining[colorIndex][index] < capacities[colorIndex][index]) {
+        	if(currentFigure != FigureType.Null && this.isRedTurn() == isRedFigure) {
+        		if(remaining[colorIndex][figureIndex] < capacities[colorIndex][figureIndex]) {
         			mapTile.clearTile(mouseX, mouseY);
-                    remaining[colorIndex][current.ordinal()]++;
+                    remaining[colorIndex][currentFigure.ordinal()]++;
                     showRemaining();
         		}
-        	} else if(this.isRedTurn() != isRed){
-        		System.out.println("Nije tvoja boja");
+        	} else if(this.isRedTurn() != isRedFigure){
+        		System.out.println("Nije tvoja boja pa ne mozes brisat to");
         	}
         }
 
         if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
-//        	System.out.println("TEST1");
             mouseX = input.getMouseX();
             mouseY = input.getMouseY();            
         }
         if (input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
-//        	System.out.println("TEST2");
-            current = mapTile.getFigureAt(mouseX, mouseY);
-            isCurrentSwordOrDragon = current == FigureType.Dragon || current == FigureType.Sword;
+        	boolean isRed = mapTile.getTileColorBeforeMoving(mouseX, mouseY) == 3 ? true : false;
+            currentFigure = mapTile.getFigureAt(mouseX, mouseY);
+            currentFigureTileColor = mapTile.getTileColor(mouseX, mouseY);
+            iscurrentFigureFigureSwordOrDragon = (currentFigure == FigureType.Dragon || currentFigure == FigureType.Sword) ? true : false;
             oldTileX = mouseX;
             oldTileY = mouseY;
+            this.isRightPlayerPlaying = (isRed == this.isRedTurn()) ? true : false;
             
-            tileColorBeforeRemoving = mapTile.getTileColorBeforeMoving(mouseX, mouseY); // 3 -red, 4 -blue
-            boolean isRed = tileColorBeforeRemoving == 3;
-            this.isRightPlayerPlaying = isRed == this.isRedTurn();
-            if(isCurrentSwordOrDragon == false && isRed == this.isRedTurn()){
+            if(iscurrentFigureFigureSwordOrDragon == false && isRed == this.isRedTurn()){
                 mapTile.clearTile(oldTileX, oldTileY);
             } else {
             	System.out.println("Vjerojatno je ili mac ili zmaj ILI NIJE TVOJ RED");
             }
             wasDown = true;
-            
-
         }
-        if (!input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && wasDown && isCurrentSwordOrDragon == false) {
-        	System.out.println("Jesam li na istom mistu?");
-        	boolean amIOnSamePlace = (mapTile.getTileX(mouseX) == mapTile.getTileX(oldTileX) && mapTile.getTileY(mouseY) == mapTile.getTileY(oldTileY)) ? true : false;
-//        	System.out.println(amIOnSamePlace);
-            if (current == FigureType.Null) {
+        if (!input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && wasDown && iscurrentFigureFigureSwordOrDragon == false) {
+//        	boolean amIOnSamePlace = (mapTile.getTileX(mouseX) == mapTile.getTileX(oldTileX) && mapTile.getTileY(mouseY) == mapTile.getTileY(oldTileY)) ? true : false;
+
+        	if (currentFigure == FigureType.Null) {
                 System.out.println("it was null");
             } else {
-            	System.out.println("Am i allowed to place there: " + amIAllowedToPlaceThere);
-            	System.out.println("isRightPlayerPlaying " + isRightPlayerPlaying);
-            	int exTileColor = mapTile.getTileColor(tileColorBeforeRemoving); //returning 0 or 1
-//            	System.out.println("Can place at " + mapTile.canPlaceAt(mouseX, mouseY));
+//            	int exTileColor = mapTile.getTileColor(oldTileX, oldTileY); 
+            	int futureTileColor = mapTile.getTileColor(mouseX, mouseY);
             	
-            	tileColorAfterRemoving = mapTile.getTileColorBeforeMoving(mouseX, mouseY);
-            	int currentTileColor = mapTile.getTileColor(tileColorAfterRemoving);
+//            	System.out.println("Ex X " + oldTileX + " " + oldTileY);
+//            	System.out.println("New X Y " + mouseX + " " + mouseY);
+//            	System.out.println("Ex tile color " + exTileColor);
+//            	System.out.println("Cuurent tile color " + currentFigureTileColor);
+//            	System.out.println("Can i place :" + mapTile.canPlaceAt(mouseX, mouseY, currentFigureTileColor, futureTileColor));
+//            	System.out.println("Am i allowed to place there " + amIAllowedToPlaceThere);
+//            	System.out.println("Is right player playing " + isRightPlayerPlaying);
             	
-                if (mapTile.canPlaceAt(mouseX, mouseY, currentTileColor, exTileColor) && amIAllowedToPlaceThere && isRightPlayerPlaying) {
+                if (mapTile.canPlaceAt(mouseX, mouseY, currentFigureTileColor, futureTileColor) && amIAllowedToPlaceThere && isRightPlayerPlaying) {
                 	System.out.println("Placing here");
-                    mapTile.setFigureAt(mouseX, mouseY, current.ordinal(), exTileColor, currentTileColor, oldTileX, oldTileY);
+                    mapTile.setFigureAt(mouseX, mouseY, oldTileX, oldTileY, currentFigureTileColor, currentFigure);
                 } else {
-                    mapTile.setFigureAt(oldTileX, oldTileY, current.ordinal(), exTileColor);
+                    mapTile.setFigureAt(oldTileX, oldTileY, currentFigure.ordinal(), currentFigureTileColor);
                 }
             }
             wasDown = false;
-            current = null;
+            currentFigure = null;
         }	
 
         if (input.isKeyPressed(Keyboard.KEY_TAB)) {
@@ -187,19 +182,19 @@ public class MainGame extends BasicGame {
     public void render(GameContainer container, Graphics g) throws SlickException {
         mapTile.render(g);
         
-        if (current != null && isCurrentSwordOrDragon == false) {
-            image = new Image(current.getPath());
+        if (currentFigure != null && iscurrentFigureFigureSwordOrDragon == false) {
+            image = new Image(currentFigure.getPath());
             g.drawImage(image, mouseX, mouseY, mouseX + Consts.TILE_WIDTH, mouseY + Consts.TILE_HEIGHT, 0, 0,
                     image.getWidth(), image.getHeight());
         }
 //       NE IDE OVO OVDI
-        if(current != null && isCurrentSwordOrDragon == false) {//red - if he cant place figure there, in this part i want to solve amIAllowedToPlaceThere
+        if(currentFigure != null && iscurrentFigureFigureSwordOrDragon == false) {//red - if he cant place figure there, in this part i want to solve amIAllowedToPlaceThere
 //        	System.out.println("Show where i can go");
         	int tileIndexX = mapTile.getTileX(mouseX);
         	int tileIndexY =mapTile.getTileY(mouseY);
         	int oldTileIndexX = mapTile.getTileX(oldTileX);
         	int oldTileIndexY = mapTile.getTileY(oldTileY);
-        	boolean amIScout = current == FigureType.Scout;
+        	boolean amIScout = currentFigure == FigureType.Scout;
         	
         	if(amIScout == true){
         		if(isScoutMovementValid(tileIndexX, tileIndexY, oldTileIndexX, oldTileIndexY) && !doesScoutCrossOtherFigureOrWater(tileIndexX, tileIndexY, oldTileIndexX, oldTileIndexY)) {

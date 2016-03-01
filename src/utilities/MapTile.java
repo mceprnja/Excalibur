@@ -62,11 +62,14 @@ public class MapTile {
     	if(isSetting) {
     		if(isRed) {
     			matrix[tileX][tileY][0] = TileType.DirtRed.ordinal();
+    			matrix[tileX][tileY][2] = 0;
     		} else {
     			matrix[tileX][tileY][0] = TileType.DirtBlue.ordinal();
+    			matrix[tileX][tileY][2] = 1;
     		}
     	} else {
     		matrix[tileX][tileY][0] = TileType.Dirt.ordinal();
+    		matrix[tileX][tileY][2] = -1;
     	}
     }
     
@@ -78,12 +81,20 @@ public class MapTile {
     	return matrix[tileX][tileY][0];
     }
     
-    public int getTileColor(int wasColor){
+    public int getTileColor(int mouseX, int mouseY){
+    	int xTile = getTileX(mouseX);
+    	int yTile = getTileY(mouseY);
+    	int tileColor = matrix[xTile][yTile][2];
+    	System.out.println("Tile color: " + tileColor);
     	
-    	if(wasColor == TileType.DirtRed.ordinal()){
-    		return 0;
-    	}   	
-    	return 1;
+    	return tileColor;
+//    	if(tileColor == 3){
+//    		return 0;
+//    	} else if (tileColor == 4) {
+//    		return 1;
+//    	} else {
+//    		return -1;
+//    	}
     }
     
     public int getTileX(int x) {
@@ -129,17 +140,22 @@ public class MapTile {
         matrix[xTile][yTile][1] = figure;
     }
     
-    public void setFigureAt(int x, int y, int figure, int exTileColor, int newTileColor, int oldX, int oldY) {
-    	boolean isRed = exTileColor == 0 ? true : false;
+    public void setFigureAt(int x, int y, int oldX, int oldY, int oldTileColor, FigureType currentFigure) {
+    	boolean isRed = oldTileColor == 0 ? true : false;
         int xTile =  (int) Math.floor(x / (Consts.TILE_WIDTH + 1)); // padding
         int yTile =  (int) Math.floor(y / (Consts.TILE_HEIGHT + 1)); // padding
         int xOldTile = getTileX(oldX);
         int yOldTile = getTileY(oldY);
-        
-        if (xTile >= xMax || yTile >= yMax) {
+        int futureTileColor = getTileColor(oldX, oldY);
+//        System.out.println(futureTileColor);
+//        System.out.println(oldTileColor);
+//        
+        if (xTile >= xMax || yTile >= yMax || futureTileColor == oldTileColor) { // 
         	System.out.println("OUT");
             return;
         }
+        
+        
         
 //        System.out.println("Figure je: "  + figure);
 //        System.out.println("Staro polje je crveno" + exTileColor);
@@ -165,7 +181,7 @@ public class MapTile {
 //        }
 //        System.out.println("Figure je: "  + figure);
         this.changeTileBackground(xTile, yTile, true, isRed);
-        matrix[xTile][yTile][1] = figure;
+        matrix[xTile][yTile][1] = currentFigure.getIndex();
     }
     
     public void clearTile(int x, int y) {
@@ -197,6 +213,9 @@ public class MapTile {
         if (xTile >= xMax || yTile >= yMax) {
             return false ;
         }
+        
+        System.out.println("Current tile color" + currentTileColor);
+        System.out.println("Ex tile color" + exTileColor);
         
         return (!(matrix[xTile][yTile][0] == TileType.Water.ordinal()) && (matrix[xTile][yTile][1] == -1 || currentTileColor != exTileColor)); //&&  == 
     }
