@@ -150,9 +150,9 @@ public class MainGame extends BasicGame {
             	tileColorAfterRemoving = mapTile.getTileColorBeforeMoving(mouseX, mouseY);
             	int currentTileColor = mapTile.getTileColor(tileColorAfterRemoving);
             	
-                if (mapTile.canPlaceAt(mouseX, mouseY, currentTileColor, exTileColor) && amIAllowedToPlaceThere) {
+                if (mapTile.canPlaceAt(mouseX, mouseY, currentTileColor, exTileColor) && amIAllowedToPlaceThere && isRightPlayerPlaying) {
                 	System.out.println("Placing here");
-                    mapTile.setFigureAt(mouseX, mouseY, current.ordinal(), exTileColor);
+                    mapTile.setFigureAt(mouseX, mouseY, current.ordinal(), exTileColor, currentTileColor, oldTileX, oldTileY);
                 } else {
                     mapTile.setFigureAt(oldTileX, oldTileY, current.ordinal(), exTileColor);
                 }

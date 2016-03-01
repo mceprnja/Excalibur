@@ -59,12 +59,6 @@ public class MapTile {
     }
     
     private void changeTileBackground(int tileX, int tileY, boolean isSetting, boolean isRed) {
-//    	System.out.println("LOLOLO");
-//    	System.out.println(tileX);
-//    	System.out.println(tileY);
-//    	System.out.println(isSetting);
-//    	System.out.println(isRed);
-//    	System.out.println(isRed);
     	if(isSetting) {
     		if(isRed) {
     			matrix[tileX][tileY][0] = TileType.DirtRed.ordinal();
@@ -132,11 +126,48 @@ public class MapTile {
         System.out.println("xTile: " + xTile + " yTile " + yTile);
         
         this.changeTileBackground(xTile, yTile, true, isRed);
-//        System.out.println(matrix[xTile][yTile][1]);
-//        System.out.println(figure);
         matrix[xTile][yTile][1] = figure;
     }
-
+    
+    public void setFigureAt(int x, int y, int figure, int exTileColor, int newTileColor, int oldX, int oldY) {
+    	boolean isRed = exTileColor == 0 ? true : false;
+        int xTile =  (int) Math.floor(x / (Consts.TILE_WIDTH + 1)); // padding
+        int yTile =  (int) Math.floor(y / (Consts.TILE_HEIGHT + 1)); // padding
+        int xOldTile = getTileX(oldX);
+        int yOldTile = getTileY(oldY);
+        
+        if (xTile >= xMax || yTile >= yMax) {
+        	System.out.println("OUT");
+            return;
+        }
+        
+//        System.out.println("Figure je: "  + figure);
+//        System.out.println("Staro polje je crveno" + exTileColor);
+//        THIS PART SHOULD RESOLVE KILLING
+//        if(newTileColor != exTileColor && figure != -1 && matrix[xTile][yTile][1] != -1){
+////        	System.out.println("IDE POKOLJ");
+//        	int figure1 = figure;
+//        	int figure2 = matrix[xTile][yTile][1];
+////        	System.out.println("Figure1 je: "  + figure1);
+////        	System.out.println("Figure2 je: "  + figure2);
+////        	
+//        	if(figure1 > figure2) {
+//        		isRed = true;
+//        		figure = figure1;
+//        		System.out.println("TU SAM");
+//        	} else {
+//        		isRed = false;
+//        		xTile = xOldTile;
+//        		yTile = yOldTile;
+//        		figure = figure2;
+//        		System.out.println("Evo me SAM");
+//        	}
+//        }
+//        System.out.println("Figure je: "  + figure);
+        this.changeTileBackground(xTile, yTile, true, isRed);
+        matrix[xTile][yTile][1] = figure;
+    }
+    
     public void clearTile(int x, int y) {
         int xTile =  (int) Math.floor(x / (Consts.TILE_WIDTH + 1)); // padding
         int yTile =  (int) Math.floor(y / (Consts.TILE_HEIGHT + 1)); // padding
