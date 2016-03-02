@@ -137,6 +137,8 @@ public class MainGame extends BasicGame {
         	}	
         } else if (input.isKeyPressed(Input.KEY_F2)){
         	isInitialFigureSettingSillOn = false;
+        } else if (input.isKeyPressed(Input.KEY_F3)){
+        	isInitialFigureSettingSillOn = !isInitialFigureSettingSillOn;
         }
         
         
@@ -163,15 +165,18 @@ public class MainGame extends BasicGame {
         }
         
         if (!input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && wasDown && !iscurrentFigureSwordOrDragon) {
-//        	boolean amIOnSamePlace = (mapTile.getTileX(mouseX) == mapTile.getTileX(oldTileX) && mapTile.getTileY(mouseY) == mapTile.getTileY(oldTileY)) ? true : false;
+        	boolean amIOnSamePlace = (mapTile.getTileX(mouseX) == mapTile.getTileX(oldTileX) && mapTile.getTileY(mouseY) == mapTile.getTileY(oldTileY)) ? true : false;
         	int indexOfFigureAtNextTile = mapTile.getFigureAt(mouseX, mouseY).getIndex();
         			
         	if (currentFigure == FigureType.Null) {
                 System.out.println("it was null");
             } else {
             	int futureTileColor = mapTile.getTileColor(mouseX, mouseY);
-
-                if (mapTile.canPlaceAt(mouseX, mouseY, currentFigureTileColor, futureTileColor, isInitialFigureSettingSillOn) && amIAllowedToPlaceAtThatTile && isRightPlayerPlaying) {
+            	
+            	
+            	if(amIOnSamePlace) {
+            		//still his turn
+            	} else if (mapTile.canPlaceAt(mouseX, mouseY, currentFigureTileColor, futureTileColor, isInitialFigureSettingSillOn) && amIAllowedToPlaceAtThatTile && isRightPlayerPlaying) {
                     int possibleFightResolver = mapTile.setFigureAt(mouseX, mouseY, oldTileX, oldTileY, currentFigureTileColor, currentFigure);
                     if(possibleFightResolver != 5) {
                     	if(possibleFightResolver == 100) {
@@ -189,7 +194,10 @@ public class MainGame extends BasicGame {
                     } else {
                     	//do nothing
                     }
-                } else {
+                    
+                    figureToPlaceColor = (isInitialFigureSettingSillOn == false) ? ++figureToPlaceColor % 2 : figureToPlaceColor;
+                } 
+            	else {
                     mapTile.setFigureAt(oldTileX, oldTileY, currentFigure.ordinal(), currentFigureTileColor);
                 }
             }
