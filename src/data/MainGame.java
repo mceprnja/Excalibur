@@ -28,7 +28,7 @@ public class MainGame extends BasicGame {
     private boolean amIAllowedToPlaceAtThatTile = false;
     int figureToPlaceColor = 0; //0 red, 1 - blue
     int tileColorBeforeRemovingDelete = 0;
-    
+
     private FigureType currentFigure = null;
     private int currentFigureTileColor;
     private boolean iscurrentFigureSwordOrDragon;
@@ -69,14 +69,6 @@ public class MainGame extends BasicGame {
     @Override
     public void update(GameContainer container, int delta) throws SlickException {
         input = container.getInput();
-        if(input.isKeyPressed(Input.KEY_F1)){
-        	figureToPlaceColor = ++figureToPlaceColor % 2;
-        	if(figureToPlaceColor == 0){
-        		System.out.println("Placing red now");
-        	} else {
-        		System.out.println("Placing blue now");
-        	}	
-        }
         
         if (input.isKeyPressed(Input.KEY_1)) { //initial setting
             if (remaining[figureToPlaceColor][indexOfFigureToPlace] > 0) {
@@ -107,13 +99,37 @@ public class MainGame extends BasicGame {
         	} else if(this.isRedTurn() != isRedFigure){
         		System.out.println("Nije tvoja boja pa ne mozes brisat to");
         	}
-        }
+        } else if (input.isKeyPressed(Keyboard.KEY_TAB)) {
+            indexOfFigureToPlace++;
+            indexOfFigureToPlace %= remaining[figureToPlaceColor].length;
 
-        if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
+            System.out.println("Now placing " + FigureType.values()[indexOfFigureToPlace].getName());
+        } else if (input.isKeyPressed(Keyboard.KEY_SPACE)) {
+            showRemaining();
+        } else if (input.isKeyPressed(Keyboard.KEY_R)) {
+            mapTile.clearAll();
+            for (int i = 0; i < remaining.length; i++) {
+            	for(int j = 0; j < remaining[figureToPlaceColor].length; j++) {
+                    remaining[i][j] = capacities[i][j];
+            	}
+            }
+            showRemaining();
+        } else if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
             mouseX = input.getMouseX();
             mouseY = input.getMouseY();
             updateAmIAllowedToPlaceThere();
-        }
+        } else if (input.isKeyPressed(Input.KEY_F1)){
+        	figureToPlaceColor = ++figureToPlaceColor % 2;
+        	if(figureToPlaceColor == 0){
+        		System.out.println("Placing red now");
+        	} else {
+        		System.out.println("Placing blue now");
+        	}	
+        } 
+        
+        
+        
+        
         if (input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
         	boolean isRedFigure = mapTile.getTileColor(mouseX, mouseY) == 0 ? true : false;
         	oldTileX = mouseX;
@@ -133,6 +149,7 @@ public class MainGame extends BasicGame {
             
             wasDown = true;
         }
+        
         if (!input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && wasDown && !iscurrentFigureSwordOrDragon) {
 //        	boolean amIOnSamePlace = (mapTile.getTileX(mouseX) == mapTile.getTileX(oldTileX) && mapTile.getTileY(mouseY) == mapTile.getTileY(oldTileY)) ? true : false;
         	int indexOfFigureAtNextTile = mapTile.getFigureAt(mouseX, mouseY).getIndex();
@@ -166,26 +183,6 @@ public class MainGame extends BasicGame {
             }
             wasDown = false;
             currentFigure = null;
-        }	
-
-        if (input.isKeyPressed(Keyboard.KEY_TAB)) {
-            indexOfFigureToPlace++;
-            indexOfFigureToPlace %= remaining[figureToPlaceColor].length;
-
-            System.out.println("Now placing " + FigureType.values()[indexOfFigureToPlace].getName());
-        }
-
-        if (input.isKeyPressed(Keyboard.KEY_SPACE)) {
-            showRemaining();
-        }
-        if (input.isKeyPressed(Keyboard.KEY_R)) {
-            mapTile.clearAll();
-            for (int i = 0; i < remaining.length; i++) {
-            	for(int j = 0; j < remaining[figureToPlaceColor].length; j++) {
-                    remaining[i][j] = capacities[i][j];
-            	}
-            }
-            showRemaining();
         }
     }
     
