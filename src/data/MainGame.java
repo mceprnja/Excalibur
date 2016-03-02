@@ -72,12 +72,14 @@ public class MainGame extends BasicGame {
     @Override
     public void update(GameContainer container, int delta) throws SlickException {
         input = container.getInput();
+//        System.out.println("TILE X " + mapTile.getTileX(input.getMouseX()) + " TILE Y " + mapTile.getTileY(input.getMouseY()));
         
-        if (input.isKeyPressed(Input.KEY_1)) { //initial setting
+        
+        if (input.isKeyPressed(Input.KEY_1) && isInitialFigureSettingSillOn) { //initial setting
             if (remaining[figureToPlaceColor][indexOfFigureToPlace] > 0) {
                 int mouseX = input.getMouseX();
                 int mouseY = input.getMouseY();
-                if (mapTile.canPlaceAt(mouseX, mouseY, false)) {
+                if (mapTile.canPlaceAt(mouseX, mouseY, isInitialFigureSettingSillOn, figureToPlaceColor)) {
                     mapTile.setFigureAt(mouseX, mouseY, indexOfFigureToPlace, figureToPlaceColor);
                     remaining[figureToPlaceColor][indexOfFigureToPlace]--;
                     showRemaining();
@@ -111,6 +113,7 @@ public class MainGame extends BasicGame {
             showRemaining();
         } else if (input.isKeyPressed(Keyboard.KEY_R)) {
             mapTile.clearAll();
+            isInitialFigureSettingSillOn = true;
             for (int i = 0; i < remaining.length; i++) {
             	for(int j = 0; j < remaining[figureToPlaceColor].length; j++) {
                     remaining[i][j] = capacities[i][j];
@@ -165,7 +168,7 @@ public class MainGame extends BasicGame {
             } else {
             	int futureTileColor = mapTile.getTileColor(mouseX, mouseY);
 
-                if (mapTile.canPlaceAt(mouseX, mouseY, currentFigureTileColor, futureTileColor) && amIAllowedToPlaceAtThatTile && isRightPlayerPlaying) {
+                if (mapTile.canPlaceAt(mouseX, mouseY, currentFigureTileColor, futureTileColor, isInitialFigureSettingSillOn) && amIAllowedToPlaceAtThatTile && isRightPlayerPlaying) {
                     int possibleFightResolver = mapTile.setFigureAt(mouseX, mouseY, oldTileX, oldTileY, currentFigureTileColor, currentFigure);
                     if(possibleFightResolver != 5) {
                     	if(possibleFightResolver == 100) {

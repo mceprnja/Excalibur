@@ -11,8 +11,8 @@ public interface IMapTile {
 	public void setFigureAt(int mouseX, int mouseY, int figure, int figureColor);
 	public int setFigureAt(int mouseX, int mouseY, int oldX, int oldY, int oldTileColor, FigureType currentFigure);
 	public void clearTile(int mouseX, int mouseY);
-	public boolean canPlaceAt(int mouseX, int mouseY, int currentTileColor, int futureTileColor);
-	public boolean canPlaceAt(int mouseX, int mouseY, boolean isSetting);
+	public boolean canPlaceAt(int mouseX, int mouseY, int currentTileColor, int futureTileColor, boolean isInitialFigureSettupPhase);
+	public boolean canPlaceAt(int mouseX, int mouseY, boolean isInitialFigureSettupPhase, int playerColor);
 	public boolean canPlaceAtWithTileIndex(int tileX, int tileY);
 	public FigureType getFigureAt(int mouseX, int mouseY);
 	public void clearAll();

@@ -196,7 +196,7 @@ public class MapTile implements IMapTile {
         }
     }
     
-    public boolean canPlaceAt(int mouseX, int mouseY, int currentTileColor, int futureTileColor) {
+    public boolean canPlaceAt(int mouseX, int mouseY, int currentTileColor, int futureTileColor, boolean isInitialFigureSettupPhase) {
     	int xTile =  getTileX(mouseX);; // padding
         int yTile =  getTileY(mouseY); // padding
         
@@ -204,20 +204,42 @@ public class MapTile implements IMapTile {
             return false ;
         }
         
-        return (!(matrix[xTile][yTile][0] == TileType.Water.ordinal()) && (matrix[xTile][yTile][1] == -1 || currentTileColor != futureTileColor));
+        boolean test = true;
+        
+        if(isInitialFigureSettupPhase){
+        	if(currentTileColor == 0){
+            	test =  (yTile >= 6) ? true : false; 	
+            } else if (currentTileColor == 1){
+            	test =  (yTile <= 3) ? true : false;
+            } else {
+            	System.out.println("Doslo je do greske");
+            }
+        }
+      
+        return (!(matrix[xTile][yTile][0] == TileType.Water.ordinal()) && (matrix[xTile][yTile][1] == -1 || currentTileColor != futureTileColor) && test);
     }
     
-    public boolean canPlaceAt(int mouseX, int mouseY, boolean isInitialFigureSettupPhase) { //if it is setting part they cant go on each other
+    public boolean canPlaceAt(int mouseX, int mouseY, boolean isInitialFigureSettupPhase, int playerColor) { //if it is setting part they cant go on each other
         int xTile =  getTileX(mouseX);; // padding
         int yTile =  getTileY(mouseY); // padding
-        
-        
-        
+        	
         if (xTile >= xMax || yTile >= yMax) {
-            return false ;
+            return false;
         }
         
-        return (!(matrix[xTile][yTile][0] == TileType.Water.ordinal()) && matrix[xTile][yTile][1] == -1);
+        boolean test = true;
+        
+        if(isInitialFigureSettupPhase){
+        	if(playerColor == 0){
+            	test =  (yTile >= 6) ? true : false; 	
+            } else if (playerColor == 1){
+            	test =  (yTile <= 3) ? true : false;
+            } else {
+            	System.out.println("Doslo je do greske");
+            }
+        }
+
+        return (!(matrix[xTile][yTile][0] == TileType.Water.ordinal()) && matrix[xTile][yTile][1] == -1 && test);
     }
     
     public boolean canPlaceAtWithTileIndex(int tileX, int tileY) {
