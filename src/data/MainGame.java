@@ -24,11 +24,10 @@ public class MainGame extends BasicGame {
     private Input input;
     private int[][] capacities = {{ 6, 1, 1, 1, 8, 2, 4, 4, 1, 3, 4, 5 }, { 6, 1, 1, 1, 8, 2, 4, 4, 1, 3, 4, 5 }};
     private int[][] remaining = {{ 6, 1, 1, 1, 8, 2, 4, 4, 1, 3, 4, 5 }, { 6, 1, 1, 1, 8, 2, 4, 4, 1, 3, 4, 5 }};
-    private int index = 0;
+    private int indexOfFigureToPlace = 0;
     private boolean isRightPlayerPlaying;
     private boolean amIAllowedToPlaceThere = false;
     int figureColor = 0; //0 red, 1 - blue
-    int tileColorBeforeRemoving = 0;
     int tileColorAfterRemoving = 0;
     int tileColorBeforeRemovingDelete = 0;
     private FigureType currentFigure = null;
@@ -81,12 +80,12 @@ public class MainGame extends BasicGame {
         }
         
         if (input.isKeyPressed(Input.KEY_1)) { //initial setting
-            if (remaining[figureColor][index] > 0) {
+            if (remaining[figureColor][indexOfFigureToPlace] > 0) {
                 int mouseX = input.getMouseX();
                 int mouseY = input.getMouseY();
                 if (mapTile.canPlaceAt(mouseX, mouseY, false)) {
-                    mapTile.setFigureAt(mouseX, mouseY, index, figureColor);
-                    remaining[figureColor][index]--;
+                    mapTile.setFigureAt(mouseX, mouseY, indexOfFigureToPlace, figureColor);
+                    remaining[figureColor][indexOfFigureToPlace]--;
                     showRemaining();
                 }
             }
@@ -150,7 +149,7 @@ public class MainGame extends BasicGame {
                     if(possibleFightResolver != 5) {
                     	if(possibleFightResolver == 100) {
                     		System.out.println("IMAMO POBJEDNIKA");
-                    		container.sleep(3000);
+                    		container.sleep(700);
                     		isFinished = true;
                     	} else if (possibleFightResolver == 0) {
                     		remaining[futureTileColor][indexOfFigureAtNextTile]--;
@@ -172,10 +171,10 @@ public class MainGame extends BasicGame {
         }	
 
         if (input.isKeyPressed(Keyboard.KEY_TAB)) {
-            index++;
-            index %= remaining[figureColor].length;
+            indexOfFigureToPlace++;
+            indexOfFigureToPlace %= remaining[figureColor].length;
 
-            System.out.println("Now placing " + FigureType.values()[index].getName());
+            System.out.println("Now placing " + FigureType.values()[indexOfFigureToPlace].getName());
         }
 
         if (input.isKeyPressed(Keyboard.KEY_SPACE)) {

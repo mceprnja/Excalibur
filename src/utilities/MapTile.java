@@ -231,7 +231,7 @@ public class MapTile {
     
     private int resolveFight(FigureType currentFigure, FigureType figureAtFutureTile){ //return 0 if same, return 1 is current one is winning,
     																//return 2 if figure at next tile is winning, return 100 if attacker is FULL GAME WINNER 
-    	if(currentFigure == figureAtFutureTile) {
+    	if(currentFigure == figureAtFutureTile && currentFigure != FigureType.Jester) {
     		return 0;
     	} else {
     		if(currentFigure == FigureType.Jester){
