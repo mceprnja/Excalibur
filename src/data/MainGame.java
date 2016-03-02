@@ -14,11 +14,12 @@ import org.newdawn.slick.SlickException;
 
 import utilities.Consts;
 import utilities.FigureType;
+import utilities.IMapTile;
 import utilities.MapTile;
 
 public class MainGame extends BasicGame {
 	
-    private MapTile mapTile = new MapTile();
+    private IMapTile mapTile = new MapTile();
 
     private Input input;
     private int[][] capacities = {{ 6, 1, 1, 1, 8, 2, 4, 4, 1, 3, 4, 5 }, { 6, 1, 1, 1, 8, 2, 4, 4, 1, 3, 4, 5 }};
@@ -112,6 +113,7 @@ public class MainGame extends BasicGame {
             for (int i = 0; i < remaining.length; i++) {
             	for(int j = 0; j < remaining[figureToPlaceColor].length; j++) {
                     remaining[i][j] = capacities[i][j];
+                    alive[i][j] = capacities[i][j];
             	}
             }
             showRemaining();

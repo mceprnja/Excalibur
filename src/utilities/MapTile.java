@@ -5,7 +5,7 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
-public class MapTile {
+public class MapTile implements IMapTile {
     private int[][][] matrix;
     
     private final int xMax = 10,  yMax = 10;
@@ -72,14 +72,7 @@ public class MapTile {
     		matrix[tileX][tileY][2] = -1;
     	}
     }
-    
-    public int getTileColorBeforeMoving(int mouseX, int mouseY){
-    	int tileX = getTileX(mouseX);
-    	int tileY = getTileY(mouseY);
-    	
-    	return matrix[tileX][tileY][0];
-    }
-    
+        
     public int getTileColor(int mouseX, int mouseY){
     	int xTile = getTileX(mouseX);
     	int yTile = getTileY(mouseY);
@@ -88,28 +81,28 @@ public class MapTile {
     	return tileColor;
     }
     
-    public int getTileX(int x) {
-        int xTile = (int) Math.floor(x / (Consts.TILE_WIDTH + 1)); // padding
+    public int getTileX(int mouseX) {
+        int xTile = (int) Math.floor(mouseX / (Consts.TILE_WIDTH + 1)); // padding
         if (xTile >= xMax)
             xTile = 0;
         return xTile;
     }
 
-    public int getTileY(int y) {
-        int yTile =  (int) Math.floor(y / (Consts.TILE_HEIGHT + 1)); // padding
+    public int getTileY(int mouseY) {
+        int yTile =  (int) Math.floor(mouseY / (Consts.TILE_HEIGHT + 1)); // padding
         if (yTile >= xMax)
             yTile = 0;
         return yTile;
     }
 
-    public TileType getTileType(int x, int y) {
-        return TileType.values()[matrix[getTileX(x)][getTileY(y)][0]];
+    public TileType getTileType(int mouseX, int mouseY) {
+        return TileType.values()[matrix[getTileX(mouseX)][getTileY(mouseY)][0]];
     }
 
-    public void setFigureAt(int x, int y, int figure, int figureColor) {
+    public void setFigureAt(int mouseX, int mouseY, int figure, int figureColor) {
     	boolean isRed = figureColor == 0 ? true : false;
-        int xTile =  (int) Math.floor(x / (Consts.TILE_WIDTH + 1)); // padding
-        int yTile =  (int) Math.floor(y / (Consts.TILE_HEIGHT + 1)); // padding
+        int xTile =  (int) Math.floor(mouseX / (Consts.TILE_WIDTH + 1)); // padding
+        int yTile =  (int) Math.floor(mouseY / (Consts.TILE_HEIGHT + 1)); // padding
         if (xTile >= xMax || yTile >= yMax) {
         	System.out.println("OUT");
             return;
@@ -119,14 +112,14 @@ public class MapTile {
         matrix[xTile][yTile][1] = figure;
     }
     
-    public int setFigureAt(int x, int y, int oldX, int oldY, int oldTileColor, FigureType currentFigure) {
+    public int setFigureAt(int mouseX, int mouseY, int oldX, int oldY, int oldTileColor, FigureType currentFigure) {
     	boolean isRed = oldTileColor == 0 ? true : false;
-        int xTile =  (int) Math.floor(x / (Consts.TILE_WIDTH + 1)); // padding
-        int yTile =  (int) Math.floor(y / (Consts.TILE_HEIGHT + 1)); // padding
+        int xTile =  (int) Math.floor(mouseX / (Consts.TILE_WIDTH + 1)); // padding
+        int yTile =  (int) Math.floor(mouseY / (Consts.TILE_HEIGHT + 1)); // padding
         int xOldTile = getTileX(oldX);
         int yOldTile = getTileY(oldY);
         int futureTileColor = getTileColor(oldX, oldY);
-        FigureType figureAtFutureTile = getFigureAt(x, y);
+        FigureType figureAtFutureTile = getFigureAt(mouseX, mouseY);
         //        
         if (xTile >= xMax || yTile >= yMax || futureTileColor == oldTileColor || currentFigure == null) { // 
         	System.out.println("OUT");
@@ -135,7 +128,7 @@ public class MapTile {
 
         if(matrix[xTile][yTile][1] != -1){	
 //        	System.out.println("Pokolj");
-        	int fightResolver = resolveFight(currentFigure, figureAtFutureTile);
+        	int fightResolver = Figure.resolveFight(currentFigure, figureAtFutureTile);
         	System.out.println("Fight resolver : " + fightResolver);
         	
         	if(fightResolver == 100) {
@@ -162,9 +155,10 @@ public class MapTile {
         }        
     }
     
-    public void clearTile(int x, int y) {
-        int xTile =  (int) Math.floor(x / (Consts.TILE_WIDTH + 1)); // padding
-        int yTile =  (int) Math.floor(y / (Consts.TILE_HEIGHT + 1)); // padding
+    public void clearTile(int mouseX, int mouseY) {
+    	int xTile =  getTileX(mouseX);; // padding
+        int yTile =  getTileY(mouseY); // padding
+        
         if (xTile >= xMax || yTile >= yMax) {
             return;
         }
@@ -184,20 +178,20 @@ public class MapTile {
         }
     }
     
-    public boolean canPlaceAt(int x, int y, int currentTileColor, int futureTileColor) {
-    	int xTile =  getTileX(x);; // padding
-        int yTile =  getTileY(y); // padding
+    public boolean canPlaceAt(int mouseX, int mouseY, int currentTileColor, int futureTileColor) {
+    	int xTile =  getTileX(mouseX);; // padding
+        int yTile =  getTileY(mouseY); // padding
         
         if (xTile >= xMax || yTile >= yMax) {
             return false ;
         }
         
-        return (!(matrix[xTile][yTile][0] == TileType.Water.ordinal()) && (matrix[xTile][yTile][1] == -1 || currentTileColor != futureTileColor)); //&&  == 
+        return (!(matrix[xTile][yTile][0] == TileType.Water.ordinal()) && (matrix[xTile][yTile][1] == -1 || currentTileColor != futureTileColor));
     }
     
-    public boolean canPlaceAt(int x, int y, boolean isSetting) { //if it is setting part they cant go on each other
-        int xTile =  getTileX(x);; // padding
-        int yTile =  getTileY(y); // padding
+    public boolean canPlaceAt(int mouseX, int mouseY, boolean isSetting) { //if it is setting part they cant go on each other
+        int xTile =  getTileX(mouseX);; // padding
+        int yTile =  getTileY(mouseY); // padding
         
         if (xTile >= xMax || yTile >= yMax) {
             return false ;
@@ -210,12 +204,12 @@ public class MapTile {
     	return (!(matrix[tileX][tileY][0] == TileType.Water.ordinal())); // && matrix[tileX][tileY][1] == -1
     }
 
-    public FigureType getFigureAt(int x, int y) {
+    public FigureType getFigureAt(int mouseX, int mouseY) {
         FigureType type = null;
-        if (matrix[getTileX(x)][getTileY(y)][1] < 0) {
+        if (matrix[getTileX(mouseX)][getTileY(mouseY)][1] < 0) {
             type = FigureType.Null;
         } else {
-            type = FigureType.values()[matrix[getTileX(x)][getTileY(y)][1]];
+            type = FigureType.values()[matrix[getTileX(mouseX)][getTileY(mouseY)][1]];
         }
 
         return type;
@@ -227,111 +221,5 @@ public class MapTile {
 
     public void update() {
 
-    }
-    
-    private int resolveFight(FigureType currentFigure, FigureType figureAtFutureTile){ //return 0 if same, return 1 is current one is winning,
-    																//return 2 if figure at next tile is winning, return 100 if attacker is FULL GAME WINNER 
-    	if(currentFigure == figureAtFutureTile && currentFigure != FigureType.Jester) {
-    		return 0;
-    	} else {
-    		if(currentFigure == FigureType.Jester){
-    			if(figureAtFutureTile == FigureType.Dragon){
-    				return 2;
-    			} else if (figureAtFutureTile == FigureType.Sword){
-    				return 100;
-    			} else {
-    				return 1;
-    			}
-    		} else if(currentFigure == FigureType.King){
-    			if(figureAtFutureTile == FigureType.Dragon){
-    				return 2;
-    			} else if (figureAtFutureTile == FigureType.Sword){
-    				return 100;
-    			} else {
-    				return 1;
-    			}
-    		} else if (currentFigure == FigureType.Knight) {
-    			if(figureAtFutureTile == FigureType.Dragon || figureAtFutureTile == FigureType.King){
-    				return 2;
-    			} else if (figureAtFutureTile == FigureType.Sword){
-    				return 100;
-    			} else {
-    				return 1;
-    			}
-    		} else if(currentFigure == FigureType.SpearHorseman){
-    			if(figureAtFutureTile == FigureType.Dragon || figureAtFutureTile == FigureType.King || figureAtFutureTile == FigureType.Knight){
-    				return 2;
-    			} else if (figureAtFutureTile == FigureType.Sword){
-    				return 100;
-    			} else {
-    				return 1;
-    			}
-    		} else if(currentFigure == FigureType.SwordHorseman) {
-    			if(figureAtFutureTile == FigureType.Dragon || figureAtFutureTile == FigureType.King || figureAtFutureTile == FigureType.Knight 
-    					|| figureAtFutureTile == FigureType.SpearHorseman){
-    				return 2;
-    			} else if (figureAtFutureTile == FigureType.Sword){
-    				return 100;
-    			} else {
-    				return 1;
-    			}
-    		} else if(currentFigure == FigureType.Spearman) {
-    			if(figureAtFutureTile == FigureType.Dragon || figureAtFutureTile == FigureType.King || figureAtFutureTile == FigureType.Knight 
-    					|| figureAtFutureTile == FigureType.SpearHorseman || figureAtFutureTile == FigureType.SwordHorseman){
-    				return 2;
-    			} else if (figureAtFutureTile == FigureType.Sword){
-    				return 100;
-    			} else {
-    				return 1;
-    			}
-    		} else if(currentFigure == FigureType.Swordsman) {
-    			if(figureAtFutureTile == FigureType.Dragon || figureAtFutureTile == FigureType.King || figureAtFutureTile == FigureType.Knight 
-    					|| figureAtFutureTile == FigureType.SpearHorseman || figureAtFutureTile == FigureType.SwordHorseman || figureAtFutureTile == FigureType.Spearman){
-    				return 2;
-    			} else if (figureAtFutureTile == FigureType.Sword){
-    				return 100;
-    			} else {
-    				return 1;
-    			}
-    		} else if(currentFigure == FigureType.Squire) {
-    			if(figureAtFutureTile == FigureType.Dragon || figureAtFutureTile == FigureType.King || figureAtFutureTile == FigureType.Knight 
-    					|| figureAtFutureTile == FigureType.SpearHorseman || figureAtFutureTile == FigureType.SwordHorseman || figureAtFutureTile == FigureType.Spearman
-    					|| figureAtFutureTile == FigureType.Swordsman){
-    				return 2;
-    			} else if (figureAtFutureTile == FigureType.Sword){
-    				return 100;
-    			} else {
-    				return 1;
-    			}
-    		} else if(currentFigure == FigureType.Wizard) {
-    			if(figureAtFutureTile == FigureType.King || figureAtFutureTile == FigureType.Knight || figureAtFutureTile == FigureType.SpearHorseman 
-    					|| figureAtFutureTile == FigureType.SwordHorseman || figureAtFutureTile == FigureType.Spearman || figureAtFutureTile == FigureType.Swordsman
-    					|| figureAtFutureTile == FigureType.Squire){
-    				return 2;
-    			} else if (figureAtFutureTile == FigureType.Sword){
-    				return 100;
-    			} else {
-    				return 1;
-    			}
-    		} else if(currentFigure == FigureType.Scout) {
-    			if(figureAtFutureTile == FigureType.Dragon || figureAtFutureTile == FigureType.King || figureAtFutureTile == FigureType.Knight 
-    					|| figureAtFutureTile == FigureType.SpearHorseman || figureAtFutureTile == FigureType.SwordHorseman || figureAtFutureTile == FigureType.Spearman
-    					|| figureAtFutureTile == FigureType.Swordsman || figureAtFutureTile == FigureType.Wizard){
-    				return 2;
-    			} else if (figureAtFutureTile == FigureType.Sword){
-    				return 100;
-    			} else {
-    				return 1;
-    			}
-    		} else {
-    			System.out.println("Igrate s zmajem ili macem sto nije dobro");
-    		}
-    		
-    		
-    		
-    		
-    	}
-    	
-    	return 0;
     }
 }
