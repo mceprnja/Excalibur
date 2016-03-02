@@ -18,7 +18,7 @@ import utilities.MapTile;
 import utilities.TileType;
 
 public class MainGame extends BasicGame {
-
+	
     private MapTile mapTile = new MapTile();
 
     private Input input;
@@ -38,7 +38,8 @@ public class MainGame extends BasicGame {
     private int oldTileX, oldTileY;
     int mouseX, mouseY;
     boolean wasDown = false;
-    GameContainer container;
+    boolean isFinished = false;
+    
 
     public static void main(String[] args) {
         try {
@@ -49,6 +50,7 @@ public class MainGame extends BasicGame {
             appgc.setIcon("images/icon.png");
             // appgc.setAlwaysRender(true);
             // appgc.setClearEachFrame(false);
+            
             appgc.start();
         } catch (SlickException ex) {
             Logger.getLogger(MainGame.class.getName()).log(Level.SEVERE, null, ex);
@@ -57,12 +59,14 @@ public class MainGame extends BasicGame {
 
     public MainGame(String gamename) {
         super(gamename);
+        
+        
     }
 
     @Override
     public void init(GameContainer container) throws SlickException {
-    	this.container = container;
     }
+    
 
     @Override
     public void update(GameContainer container, int delta) throws SlickException {
@@ -73,7 +77,7 @@ public class MainGame extends BasicGame {
         		System.out.println("Placing red now");
         	} else {
         		System.out.println("Placing blue now");
-        	}
+        	}	
         }
         
         if (input.isKeyPressed(Input.KEY_1)) { //initial setting
@@ -145,7 +149,9 @@ public class MainGame extends BasicGame {
                     int possibleFightResolver = mapTile.setFigureAt(mouseX, mouseY, oldTileX, oldTileY, currentFigureTileColor, currentFigure);
                     if(possibleFightResolver != 5) {
                     	if(possibleFightResolver == 100) {
-                    		container.pause();
+                    		System.out.println("IMAMO POBJEDNIKA");
+                    		container.sleep(3000);
+                    		isFinished = true;
                     	} else if (possibleFightResolver == 0) {
                     		remaining[futureTileColor][indexOfFigureAtNextTile]--;
                     		remaining[currentFigureTileColor][currentFigure.getIndex()]--;
@@ -188,13 +194,19 @@ public class MainGame extends BasicGame {
     
     @Override
     public void render(GameContainer container, Graphics g) throws SlickException {
-        mapTile.render(g);
+    	if(isFinished == false){
+    		mapTile.render(g);
+            
+            if (currentFigure != null && iscurrentFigureSwordOrDragon == false) {
+                image = new Image(currentFigure.getPath());
+                g.drawImage(image, mouseX, mouseY, mouseX + Consts.TILE_WIDTH, mouseY + Consts.TILE_HEIGHT, 0, 0,
+                        image.getWidth(), image.getHeight());
+            }
+    	} else {
+    		String winner = isRedTurn() == true ? "red" : "blue";
+        	g.drawString("Winner is " + winner + " player", Consts.TILE_WIDTH * 6, Consts.TILE_HEIGHT * 4 );
+    	}
         
-        if (currentFigure != null && iscurrentFigureSwordOrDragon == false) {
-            image = new Image(currentFigure.getPath());
-            g.drawImage(image, mouseX, mouseY, mouseX + Consts.TILE_WIDTH, mouseY + Consts.TILE_HEIGHT, 0, 0,
-                    image.getWidth(), image.getHeight());
-        }
     }
 
     private void showRemaining() {

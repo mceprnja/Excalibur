@@ -140,6 +140,7 @@ public class MapTile {
         	
         	if(fightResolver == 100) {
         		System.out.println("IMAMO POBJEDNIKA");
+        		this.changeTileBackground(xTile, yTile, true, isRed);
         		return 100;
         	} else if (fightResolver == 0) {
         		matrix[xTile][yTile][1] = -1;
