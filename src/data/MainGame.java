@@ -30,7 +30,7 @@ public class MainGame extends BasicGame {
     private boolean amIAllowedToPlaceAtThatTile = false;
     int figureToPlaceColor = 0; //0 red, 1 - blue
     int tileColorBeforeRemovingDelete = 0;
-
+    
     private FigureType currentFigure = null;
     private int currentFigureTileColor;
     private boolean iscurrentFigureSwordOrDragon;
@@ -39,6 +39,7 @@ public class MainGame extends BasicGame {
     int mouseX, mouseY;
     boolean wasDown = false;
     boolean isGameFinished = false;
+    boolean isInitialFigureSettingSillOn = true;
     
 
     public static void main(String[] args) {
@@ -128,7 +129,9 @@ public class MainGame extends BasicGame {
         	} else {
         		System.out.println("Placing blue now");
         	}	
-        } 
+        } else if (input.isKeyPressed(Input.KEY_F2)){
+        	isInitialFigureSettingSillOn = false;
+        }
         
         
         
@@ -192,9 +195,10 @@ public class MainGame extends BasicGame {
     @Override
     public void render(GameContainer container, Graphics g) throws SlickException {
     	if(isGameFinished == false){
-    		mapTile.render(g);
+//    		mapTile.render(g);
+    		mapTile.render(g, figureToPlaceColor);
             
-            if (currentFigure != null && iscurrentFigureSwordOrDragon == false) {
+            if (currentFigure != null && iscurrentFigureSwordOrDragon == false && isRightPlayerPlaying) {
                 image = new Image(currentFigure.getPath());
                 g.drawImage(image, mouseX, mouseY, mouseX + Consts.TILE_WIDTH, mouseY + Consts.TILE_HEIGHT, 0, 0,
                         image.getWidth(), image.getHeight());

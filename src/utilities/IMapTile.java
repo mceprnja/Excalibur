@@ -4,6 +4,7 @@ import org.newdawn.slick.SlickException;
 
 public interface IMapTile {
 	public void render(Graphics g) throws SlickException;
+	public void render(Graphics g, int sidePlaying) throws SlickException;
 	public int getTileColor(int mouseX, int mouseY);
 	public int getTileX(int mouseX);
 	public int getTileY(int mouseY);

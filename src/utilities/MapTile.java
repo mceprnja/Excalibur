@@ -55,7 +55,25 @@ public class MapTile implements IMapTile {
                 }
             }
         }
-
+    }
+    
+    public void render(Graphics g, int sidePlaying) throws SlickException {
+        for (int i = 0; i < xMax; i++) {
+            for (int j = 0; j < yMax; j++) {
+                int xPos = Consts.TILE_WIDTH * i + i;
+                int yPos = Consts.TILE_HEIGHT * j + j;
+                int x2 = xPos + Consts.TILE_WIDTH;
+                int y2 = yPos + Consts.TILE_HEIGHT;
+                g.drawImage(getImage(matrix[i][j][0]), xPos, yPos, x2, y2, 0, 0, Consts.TILE_WIDTH, Consts.TILE_HEIGHT);
+                
+                if (matrix[i][j][1] != -1 && matrix[i][j][2] == sidePlaying) {
+                    image = new Image(FigureType.values()[matrix[i][j][1]].getPath());
+                    
+                    g.drawImage(image, xPos, yPos, xPos + Consts.TILE_WIDTH, yPos + Consts.TILE_HEIGHT, 0, 0,
+                            image.getWidth(), image.getHeight());
+                }
+            }
+        }
     }
     
     private void changeTileBackground(int tileX, int tileY, boolean isSetting, boolean isRed) {
@@ -189,9 +207,11 @@ public class MapTile implements IMapTile {
         return (!(matrix[xTile][yTile][0] == TileType.Water.ordinal()) && (matrix[xTile][yTile][1] == -1 || currentTileColor != futureTileColor));
     }
     
-    public boolean canPlaceAt(int mouseX, int mouseY, boolean isSetting) { //if it is setting part they cant go on each other
+    public boolean canPlaceAt(int mouseX, int mouseY, boolean isInitialFigureSettupPhase) { //if it is setting part they cant go on each other
         int xTile =  getTileX(mouseX);; // padding
         int yTile =  getTileY(mouseY); // padding
+        
+        
         
         if (xTile >= xMax || yTile >= yMax) {
             return false ;
