@@ -23,6 +23,7 @@ public class MainGame extends BasicGame {
     private Input input;
     private int[][] capacities = {{ 6, 1, 1, 1, 8, 2, 4, 4, 1, 3, 4, 5 }, { 6, 1, 1, 1, 8, 2, 4, 4, 1, 3, 4, 5 }};
     private int[][] remaining = {{ 6, 1, 1, 1, 8, 2, 4, 4, 1, 3, 4, 5 }, { 6, 1, 1, 1, 8, 2, 4, 4, 1, 3, 4, 5 }};
+    private int[][] alive = {{ 6, 1, 1, 1, 8, 2, 4, 4, 1, 3, 4, 5 }, { 6, 1, 1, 1, 8, 2, 4, 4, 1, 3, 4, 5 }};
     private int indexOfFigureToPlace = 0;
     private boolean isRightPlayerPlaying;
     private boolean amIAllowedToPlaceAtThatTile = false;
@@ -167,12 +168,12 @@ public class MainGame extends BasicGame {
                     		container.sleep(700);
                     		isGameFinished = true;
                     	} else if (possibleFightResolver == 0) {
-                    		remaining[futureTileColor][indexOfFigureAtNextTile]--;
-                    		remaining[currentFigureTileColor][currentFigure.getIndex()]--;
+                    		alive[futureTileColor][indexOfFigureAtNextTile]--;
+                    		alive[currentFigureTileColor][currentFigure.getIndex()]--;
                     	} else if (possibleFightResolver == 1) {
-                    		remaining[futureTileColor][indexOfFigureAtNextTile]--;
+                    		alive[futureTileColor][indexOfFigureAtNextTile]--;
                     	} else {
-                    		remaining[currentFigureTileColor][currentFigure.getIndex()]--;
+                    		alive[currentFigureTileColor][currentFigure.getIndex()]--;
                     	}
                     } else {
                     	//do nothing
