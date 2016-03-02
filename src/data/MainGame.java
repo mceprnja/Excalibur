@@ -1,5 +1,6 @@
 package data;
 
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,7 +42,10 @@ public class MainGame extends BasicGame {
     boolean isGameFinished = false;
     boolean isInitialFigureSettingSillOn = true;
     
+    long startTime;
+    long elapsedTime;
 
+        
     public static void main(String[] args) {
         try {
             AppGameContainer appgc;
@@ -60,8 +64,8 @@ public class MainGame extends BasicGame {
 
     public MainGame(String gamename) {
         super(gamename);
-        
-        
+        startTime = System.currentTimeMillis();
+        elapsedTime = 0L;
     }
 
     @Override
@@ -73,7 +77,6 @@ public class MainGame extends BasicGame {
     public void update(GameContainer container, int delta) throws SlickException {
         input = container.getInput();
 //        System.out.println("TILE X " + mapTile.getTileX(input.getMouseX()) + " TILE Y " + mapTile.getTileY(input.getMouseY()));
-        
         
         if (input.isKeyPressed(Input.KEY_1) && isInitialFigureSettingSillOn) { //initial setting
             if (remaining[figureToPlaceColor][indexOfFigureToPlace] > 0) {
@@ -192,6 +195,14 @@ public class MainGame extends BasicGame {
             }
             wasDown = false;
             currentFigure = null;
+        }
+        
+        
+        if(elapsedTime < 5*60*1000) {
+        	elapsedTime = (new Date()).getTime() - startTime;
+        } else if (isInitialFigureSettingSillOn){
+        	System.out.println("Prosa je minut");
+        	isInitialFigureSettingSillOn = false;
         }
     }
     
